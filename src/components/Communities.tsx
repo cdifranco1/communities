@@ -2,7 +2,8 @@ import { useState, FunctionComponent, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Modal } from "./BasicModal";
 import { GreenButton, RedButton } from "./buttons/BasicButtons";
-import DynamicForm from "./community/NewCommunityForm";
+import NewCommunityForm from "./community/NewCommunityForm";
+import { Input, Label, LabelSize } from "./input/TextInput";
 
 interface CommunityType {
   id: number;
@@ -72,7 +73,7 @@ const CommunityFilters = ({
   filterState: FilterState;
 }) => {
   return (
-    <div className="flex justify-between py-2">
+    <div className="flex justify-between">
       <div className="w-2/5 flex justify-between">
         <FilterSpan isActive={categories}>Categories</FilterSpan>
       </div>
@@ -87,16 +88,27 @@ const Communities = () => {
   useEffect(() => console.log("Communities rendering"));
 
   return (
-    <div className="border border-blue-400">
-      <CommunityFilters filterState={filters} />
+    <div className="border border-blue-400 p-2">
+      <div className="flex justify-between py-3">
+        <CommunityFilters filterState={filters} />
+        <Modal
+          modalButtonText="Create Community"
+          title="Create a Community"
+          closeButton={RedButton}
+          saveChangesButton={
+            <GreenButton
+              clickHandler={(_: React.MouseEvent<HTMLButtonElement>) =>
+                console.log("SAVE CHANGES BUTTON NEEDS TO DO SOMETHING!!")
+              }
+            >
+              {"Save Changes"}
+            </GreenButton>
+          }
+        >
+          <NewCommunityForm />
+        </Modal>
+      </div>
       <CommunityList communities={communities} />
-      <Modal
-        title="Create a Community"
-        closeButton={RedButton}
-        saveChangesButton={GreenButton}
-      >
-        <DynamicForm />
-      </Modal>
     </div>
   );
 };

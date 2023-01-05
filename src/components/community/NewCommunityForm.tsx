@@ -1,14 +1,9 @@
 import React, { ChangeEvent, useState } from "react";
+import { Input, Label, LabelProps, LabelSize } from "../input/TextInput";
+import RadioButton from "../input/RadioButton";
+import SurveyBuilder from "./SurveyBuilder";
 
-enum LabelSize {
-  Small = "text-sm",
-  Medium = "text-md",
-  Large = "text-lg",
-  XL = "text=xl",
-  XXL = "text-2xl",
-}
-
-function TextInput({
+function LabeledInput({
   name,
   value,
   label,
@@ -21,105 +16,73 @@ function TextInput({
   label: string;
   labelSize: LabelSize;
   id: string;
-  changeHandler: (e: ChangeEvent<HTMLInputElement>) => void;
+  changeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <div className="mt-2">
-      <label
-        htmlFor={id}
-        className={`block font-medium leading-5 text-gray-700 text-left ${labelSize}`}
-      >
-        {label}
-      </label>
-      <div className="mt-1 rounded-md shadow-sm">
-        <input
-          name={name}
-          id={id}
-          value={value}
-          onChange={changeHandler}
-          className="form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-        />
-      </div>
+    <div>
+      <Label text={label} id={id} size={labelSize} />
+      <Input name={name} id={id} value={value} changeHandler={changeHandler} />
     </div>
   );
 }
 
-// function DynamicForm() {
-//   const [inputs, setInputs] = useState([{ label: "Input 1", id: "input1" }]);
-
-//   const handleAddInput = () => {
-//     const newInputs = [
-//       ...inputs,
-//       {
-//         label: "Input " + (inputs.length + 1),
-//         id: "input" + (inputs.length + 1),
-//       },
-//     ];
-//     setInputs(newInputs);
-//   };
-
-//   return (
-//     <form>
-//       {inputs.map((input) => (
-//         <TextInput
-//           value={"don't care"}
-//           label={input.label}
-//           id={input.id}
-//           labelSize={LabelSize.Large}
-//         />
-//       ))}
-//       <button
-//         type="button"
-//         onClick={handleAddInput}
-//         className="bg-blue-500 text-white px-2 py-1 rounded mt-2"
-//       >
-//         Add Question
-//       </button>
-//     </form>
-//   );
-// }
-
-// <label>
-//   <input type="radio" name="public" value="" onChange={handleChange} />
-//   Public
-// </label>
-
-enum RadioButtonValues {
-  public = "0",
-  private = "1",
-  restricted = "2",
+interface TextBoxProps {
+  value: string;
+  onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  id: string;
+  name: string;
 }
 
-const RadioButton = ({
-  children,
-  value,
-  name,
-  onChange,
-  isSelected,
-}: {
-  children: React.ReactNode;
-  value: string;
-  name: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  isSelected: boolean;
-}) => {
+const TextBox = ({ value, onChange, placeholder, id, name }: TextBoxProps) => {
   return (
-    <label>
-      <input
-        name={name}
-        type="radio"
-        value={value}
-        checked={isSelected}
-        onChange={onChange}
-      />
-      {children}
-    </label>
+    <textarea
+      className="border rounded-md shadow-sm px-3 py-2 resize-none w-full"
+      id={id}
+      name={name}
+      rows={10}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+    />
   );
 };
 
+interface CommunityOverviewProps {
+  labelText: string;
+  labelSize: LabelSize;
+  name: string;
+  value: string;
+  changeHandler: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+}
+
+function LabeledTextBox({
+  labelText,
+  labelSize,
+  name,
+  value,
+  changeHandler,
+}: CommunityOverviewProps) {
+  return (
+    <div>
+      <Label text={labelText} size={labelSize} id="overview" />
+      <TextBox
+        value={value}
+        onChange={changeHandler}
+        id="overview"
+        name={name}
+      />
+    </div>
+  );
+}
+
+// Pieces to add:
+//    1. Rules
+//    2. Overview / Profile
 function NewCommunityForm() {
   const [radioButtonValue, setRadioButtonValue] = useState("0");
   const [communityName, setCommunityName] = useState("");
+  const [textArea, setTextArea] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.name == "privacy") {
@@ -131,27 +94,39 @@ function NewCommunityForm() {
     }
   };
 
+  //  Should put a limit on the size of the text area.
+  const handleTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextArea(e.target.value);
+  };
+
   const isRadioSelected = (radioValue: string) =>
     radioButtonValue === radioValue;
 
   return (
-    <form className="my-4 border border-red broder-5">
-      <TextInput
+    <form className="my-4 p-2">
+      <LabeledInput
         name="communityName"
         value={communityName}
         label="Community Name"
         id="communityName"
-        labelSize={LabelSize.Medium}
+        labelSize={LabelSize.Large}
         changeHandler={handleChange}
       />
-      <div className="flex flex-col space-y-2">
+      <LabeledTextBox
+        name="communityOverview"
+        value={textArea}
+        labelText="Profile"
+        labelSize={LabelSize.Medium}
+        changeHandler={handleTextArea}
+      />
+      <div className="flex flex-col space-y-2 py-3">
         <RadioButton
           name="privacy"
-          value="0" // to be changed to actually update input
+          value="0"
           onChange={handleChange}
           isSelected={isRadioSelected("0")}
         >
-          Public
+          <span className="font-bold p-2">Public</span>
         </RadioButton>
         <RadioButton
           name="privacy"
@@ -159,7 +134,7 @@ function NewCommunityForm() {
           onChange={handleChange}
           isSelected={isRadioSelected("1")}
         >
-          Restricted
+          <span className="font-bold p-2">Restricted</span>
         </RadioButton>
         <RadioButton
           name="privacy"
@@ -167,8 +142,11 @@ function NewCommunityForm() {
           onChange={handleChange}
           isSelected={isRadioSelected("2")}
         >
-          Private
+          <span className="font-bold p-2">Private</span>
         </RadioButton>
+        <div className="py-3">
+          <SurveyBuilder />
+        </div>
       </div>
     </form>
   );

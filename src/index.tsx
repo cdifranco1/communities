@@ -5,7 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Communities from "./components/Communities";
-import Community from "./components/community/Community";
+import CommunityHome from "./components/community/CommunityHome";
 
 const router = createBrowserRouter([
   {
@@ -18,7 +18,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/community/:id",
-        element: <Community />,
+        element: <CommunityHome />,
       },
     ],
   },
